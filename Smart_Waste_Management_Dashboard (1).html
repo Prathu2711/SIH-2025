@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Waste Management System — SIH 2025</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<style>
+  :root{
+    --ink:#16211F;
+    --teal-900:#0B3D2E;
+    --teal-700:#124E3C;
+    --paper:#EEEBDD;
+    --paper-card:#F8F6EC;
+    --amber:#E8A23D;
+    --amber-text:#7A4E0F;
+    --rust:#C2542B;
+    --rust-text:#7A2C13;
+    --sage:#6E9B7C;
+    --sage-text:#2E4A37;
+    --line:#D9D5C3;
+    --muted:#6B6A5E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .app{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    min-height:100vh;
+  }
+  /* Sidebar */
+  .sidebar{
+    background:var(--teal-900);
+    color:#DCE9E2;
+    padding:28px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:32px;
+  }
+  .brand{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:17px;
+    line-height:1.3;
+    color:#fff;
+  }
+  .brand span{display:block; font-size:11px; font-weight:400; color:#9FC2AE; margin-top:4px; letter-spacing:.04em;}
+  nav{display:flex; flex-direction:column; gap:2px;}
+  .nav-item{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 10px; border-radius:6px;
+    font-size:13.5px; color:#B9D2C4;
+    cursor:default;
+  }
+  .nav-item i{font-size:16px;}
+  .nav-item.active{background:rgba(255,255,255,.08); color:#fff; font-weight:500;}
+  .sidebar-foot{
+    margin-top:auto; font-size:11px; color:#7DA491; line-height:1.6;
+    border-top:1px solid rgba(255,255,255,.12); padding-top:14px;
+  }
+
+  /* Main */
+  main{padding:28px 34px 48px;}
+  .topbar{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    margin-bottom:26px; flex-wrap:wrap; gap:14px;
+  }
+  .topbar h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600; font-size:22px; margin:0 0 4px;
+  }
+  .topbar p{margin:0; font-size:13px; color:var(--muted);}
+  .sync-pill{
+    display:flex; align-items:center; gap:8px;
+    background:var(--paper-card); border:1px solid var(--line);
+    border-radius:20px; padding:7px 14px; font-size:12.5px; color:var(--muted);
+  }
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--sage);}
+
+  /* Stat cards */
+  .stats{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px;
+  }
+  .stat{
+    background:var(--paper-card); border:1px solid var(--line); border-radius:10px;
+    padding:16px 18px;
+  }
+  .stat .label{font-size:12px; color:var(--muted); margin-bottom:8px;}
+  .stat .value{font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600;}
+  .stat .sub{font-size:11.5px; margin-top:4px;}
+  .up{color:var(--sage-text);}
+  .warn{color:var(--rust-text);}
+
+  /* Grid: map + side panel */
+  .grid{display:grid; grid-template-columns:1.55fr 1fr; gap:16px; margin-bottom:16px;}
+  .panel{
+    background:var(--paper-card); border:1px solid var(--line); border-radius:10px;
+    padding:18px 20px;
+  }
+  .panel h2{
+    font-family:'Space Grotesk', sans-serif; font-size:14.5px; font-weight:600;
+    margin:0 0 2px; display:flex; align-items:center; gap:8px;
+  }
+  .panel .desc{font-size:12px; color:var(--muted); margin:0 0 14px;}
+
+  .legend{display:flex; gap:16px; font-size:11.5px; color:var(--muted); margin-top:10px; flex-wrap:wrap;}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .swatch{width:9px; height:9px; border-radius:50%; display:inline-block;}
+
+  /* Bin list */
+  .bin-row{
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px;
+    padding:9px 0; border-bottom:1px solid var(--line); font-size:12.5px;
+  }
+  .bin-row:last-child{border-bottom:none;}
+  .bin-id{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); min-width:96px;}
+  .bar-track{background:#E4E1D2; height:6px; border-radius:3px; overflow:hidden;}
+  .bar-fill{height:100%; border-radius:3px;}
+  .pct{font-family:'IBM Plex Mono',monospace; font-size:11.5px; min-width:34px; text-align:right;}
+
+  /* Bottom row */
+  .bottom{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .stack-chip{
+    display:inline-flex; align-items:center; gap:6px;
+    background:#E7E3D3; border:1px solid var(--line); border-radius:16px;
+    padding:5px 12px; font-size:11.5px; margin:4px 6px 0 0; color:var(--ink);
+  }
+  .phone{
+    width:150px; border:2px solid var(--ink); border-radius:18px; padding:10px;
+    background:#fff; margin:0 auto;
+  }
+  .phone .screen-head{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:12px; margin-bottom:8px;}
+  .phone .row{display:flex; align-items:center; gap:8px; font-size:10.5px; padding:6px 0; border-bottom:1px solid #EEE;}
+  .phone .row i{font-size:14px; color:var(--teal-700);}
+  .phone-wrap{display:flex; gap:20px; align-items:center;}
+  .phone-caption{flex:1;}
+  .phone-caption h3{font-family:'Space Grotesk',sans-serif; font-size:13.5px; margin:0 0 6px;}
+  .phone-caption p{font-size:12px; color:var(--muted); line-height:1.6; margin:0;}
+
+  @media (max-width:880px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{flex-direction:row; overflow-x:auto; align-items:center;}
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .grid, .bottom{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">Smart Waste<span>Management System · SIH 2025</span></div>
+    <nav>
+      <div class="nav-item active"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+      <div class="nav-item"><i class="ti ti-trash"></i>Smart bins</div>
+      <div class="nav-item"><i class="ti ti-route"></i>Truck routes</div>
+      <div class="nav-item"><i class="ti ti-device-mobile"></i>Citizen app</div>
+      <div class="nav-item"><i class="ti ti-fingerprint"></i>Aadhaar registry</div>
+    </nav>
+    <div class="sidebar-foot">
+      Prototype built for Smart India<br>Hackathon 2025 · Municipal<br>operations demo
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div>
+        <h1>Ward 12 collection overview</h1>
+        <p>Route recomputed via A* / Dijkstra shortest-path routing</p>
+      </div>
+      <div class="sync-pill"><span class="dot"></span>Synced with fleet · route recalculated 2 min ago</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="label">Bins due for collection</div>
+        <div class="value">4 <span style="font-size:14px; color:var(--muted); font-weight:400;">of 6</span></div>
+        <div class="sub warn">fill level ≥ 70%</div>
+      </div>
+      <div class="stat">
+        <div class="label">Optimized route distance</div>
+        <div class="value">20.5 <span style="font-size:14px; color:var(--muted); font-weight:400;">km</span></div>
+        <div class="sub up">depot → 4 stops → depot</div>
+      </div>
+      <div class="stat">
+        <div class="label">Estimated fuel cost</div>
+        <div class="value mono" style="font-family:'Space Grotesk',sans-serif;">₹256</div>
+        <div class="sub up">vs ₹341 unoptimized route</div>
+      </div>
+      <div class="stat">
+        <div class="label">Aadhaar-linked households</div>
+        <div class="value">258</div>
+        <div class="sub">across 6 registered bins</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2><i class="ti ti-map-2"></i>Optimized collection route</h2>
+        <p class="desc">Shortest path solved with A* / Dijkstra · depot to every due bin and back</p>
+        <svg viewBox="0 0 520 340" width="100%" style="display:block;">
+          <!-- roads -->
+          <g stroke="#D9D5C3" stroke-width="2" fill="none">
+            <line x1="60" y1="290" x2="150" y2="240"/>
+            <line x1="150" y1="240" x2="230" y2="220"/>
+            <line x1="230" y1="220" x2="320" y2="150"/>
+            <line x1="150" y1="240" x2="170" y2="150"/>
+            <line x1="170" y1="150" x2="230" y2="220"/>
+            <line x1="170" y1="150" x2="260" y2="90"/>
+            <line x1="320" y1="150" x2="380" y2="100"/>
+            <line x1="320" y1="150" x2="350" y2="230"/>
+            <line x1="230" y1="220" x2="350" y2="230"/>
+            <line x1="260" y1="90" x2="350" y2="230"/>
+            <line x1="260" y1="90" x2="380" y2="100"/>
+            <line x1="60" y1="290" x2="170" y2="150"/>
+            <line x1="380" y1="100" x2="440" y2="60"/>
+            <line x1="350" y1="230" x2="440" y2="220"/>
+          </g>
+          <!-- optimized route, dashed and animated -->
+          <path d="M60,290 L150,240 L230,220 L320,150 L350,230 L260,90 L350,230 L60,290"
+                fill="none" stroke="#C2542B" stroke-width="3.5" stroke-dasharray="10 7" stroke-linecap="round">
+            <animate attributeName="stroke-dashoffset" from="400" to="0" dur="2.4s" fill="freeze"/>
+          </path>
+          <!-- depot -->
+          <g transform="translate(60,290)">
+            <rect x="-11" y="-11" width="22" height="22" rx="4" fill="#0B3D2E"/>
+            <text x="0" y="4" text-anchor="middle" font-size="10" fill="#fff" font-family="IBM Plex Mono, monospace">D</text>
+          </g>
+          <text x="60" y="312" text-anchor="middle" font-size="10.5" fill="#6B6A5E" font-family="IBM Plex Sans">Depot</text>
+
+          <!-- due bins (rust) -->
+          <g transform="translate(150,240)"><circle r="10" fill="#C2542B"/><text y="4" text-anchor="middle" font-size="9" fill="#fff" font-family="IBM Plex Mono, monospace">88</text></g>
+          <text x="150" y="264" text-anchor="middle" font-size="10" fill="#6B6A5E">BIN-0102</text>
+
+          <g transform="translate(230,220)"><circle r="10" fill="#C2542B"/><text y="4" text-anchor="middle" font-size="9" fill="#fff" font-family="IBM Plex Mono, monospace">92</text></g>
+          <text x="230" y="244" text-anchor="middle" font-size="10" fill="#6B6A5E">BIN-0103</text>
+
+          <g transform="translate(260,90)"><circle r="10" fill="#C2542B"/><text y="4" text-anchor="middle" font-size="9" fill="#fff" font-family="IBM Plex Mono, monospace">81</text></g>
+          <text x="260" y="72" text-anchor="middle" font-size="10" fill="#6B6A5E">BIN-0107</text>
+
+          <g transform="translate(350,230)"><circle r="10" fill="#C2542B"/><text y="4" text-anchor="middle" font-size="9" fill="#fff" font-family="IBM Plex Mono, monospace">76</text></g>
+          <text x="350" y="254" text-anchor="middle" font-size="10" fill="#6B6A5E">BIN-0109</text>
+
+          <!-- ok bins (sage) -->
+          <g transform="translate(320,150)"><circle r="8" fill="#6E9B7C"/><text y="3.5" text-anchor="middle" font-size="8" fill="#fff" font-family="IBM Plex Mono, monospace">35</text></g>
+          <text x="320" y="132" text-anchor="middle" font-size="9.5" fill="#6B6A5E">BIN-0105</text>
+
+          <g transform="translate(380,100)"><circle r="8" fill="#6E9B7C"/><text y="3.5" text-anchor="middle" font-size="8" fill="#fff" font-family="IBM Plex Mono, monospace">20</text></g>
+          <text x="380" y="83" text-anchor="middle" font-size="9.5" fill="#6B6A5E">BIN-0110</text>
+        </svg>
+        <div class="legend">
+          <span><i class="swatch" style="background:#C2542B;"></i>Due for collection (≥70% fill)</span>
+          <span><i class="swatch" style="background:#6E9B7C;"></i>Below threshold</span>
+          <span><i class="swatch" style="background:#0B3D2E; border-radius:3px;"></i>Depot</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2><i class="ti ti-trash"></i>Bin registry</h2>
+        <p class="desc">Fill level per Aadhaar-linked smart bin</p>
+
+        <div class="bin-row">
+          <span class="bin-id">BIN-0103</span>
+          <div class="bar-track"><div class="bar-fill" style="width:92%; background:#C2542B;"></div></div>
+          <span class="pct">92%</span>
+        </div>
+        <div class="bin-row">
+          <span class="bin-id">BIN-0102</span>
+          <div class="bar-track"><div class="bar-fill" style="width:88%; background:#C2542B;"></div></div>
+          <span class="pct">88%</span>
+        </div>
+        <div class="bin-row">
+          <span class="bin-id">BIN-0107</span>
+          <div class="bar-track"><div class="bar-fill" style="width:81%; background:#C2542B;"></div></div>
+          <span class="pct">81%</span>
+        </div>
+        <div class="bin-row">
+          <span class="bin-id">BIN-0109</span>
+          <div class="bar-track"><div class="bar-fill" style="width:76%; background:#E8A23D;"></div></div>
+          <span class="pct">76%</span>
+        </div>
+        <div class="bin-row">
+          <span class="bin-id">BIN-0105</span>
+          <div class="bar-track"><div class="bar-fill" style="width:35%; background:#6E9B7C;"></div></div>
+          <span class="pct">35%</span>
+        </div>
+        <div class="bin-row">
+          <span class="bin-id">BIN-0110</span>
+          <div class="bar-track"><div class="bar-fill" style="width:20%; background:#6E9B7C;"></div></div>
+          <span class="pct">20%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="panel">
+        <h2><i class="ti ti-device-mobile"></i>Citizen app preview</h2>
+        <p class="desc">Mobile app for citizen training and Aadhaar-linked bin registration</p>
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="screen-head">My ward</div>
+            <div class="row"><i class="ti ti-fingerprint"></i>Bin linked to Aadhaar ID</div>
+            <div class="row"><i class="ti ti-truck"></i>Truck arrives in 18 min</div>
+            <div class="row"><i class="ti ti-recycle"></i>Segregation training: 3/5</div>
+            <div class="row" style="border-bottom:none;"><i class="ti ti-alert-circle"></i>Report an overflow</div>
+          </div>
+          <div class="phone-caption">
+            <h3>Built with React Native / Flutter</h3>
+            <p>Citizens link their bin to their Aadhaar ID, complete waste-segregation training modules, track truck ETA, and flag overflowing bins directly from the app.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2><i class="ti ti-stack-2"></i>Tech stack</h2>
+        <p class="desc">Ecosystem components behind this dashboard</p>
+        <div>
+          <span class="stack-chip"><i class="ti ti-brand-python"></i>Python backend</span>
+          <span class="stack-chip"><i class="ti ti-coffee"></i>Java services</span>
+          <span class="stack-chip"><i class="ti ti-device-mobile"></i>React Native / Flutter</span>
+          <span class="stack-chip"><i class="ti ti-database"></i>NoSQL database</span>
+          <span class="stack-chip"><i class="ti ti-route"></i>A* search</span>
+          <span class="stack-chip"><i class="ti ti-map-route"></i>Dijkstra's algorithm</span>
+          <span class="stack-chip"><i class="ti ti-fingerprint"></i>Aadhaar-linked bins</span>
+        </div>
+        <p class="desc" style="margin-top:16px;">Route optimization minimizes total collection-truck distance — and therefore fuel cost — using classic shortest-path search over the ward's road graph. See the accompanying notebook for the algorithm implementation.</p>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
